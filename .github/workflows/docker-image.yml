@@ -1,8 +1,8 @@
 name: Docker Image CI
 
 on:
-  push:
-    branches: [ "master" ]
+#  push:
+#    branches: [ "master" ]
 
 env:
   TEST_TAG: lanbui/my-personal-site:test
@@ -40,7 +40,7 @@ jobs:
       # -
       #   name: Test
       #   run: |
-      #     docker run --rm ${{ env.TEST_TAG }}          
+      #     docker run --rm ${{ env.TEST_TAG }}
       -
         name: Build and push
         uses: docker/build-push-action@v4
@@ -59,8 +59,8 @@ jobs:
       # -
       #   name: Inspect
       #   run: |
-      #     docker image inspect my-personal-site:latest    
-          
+      #     docker image inspect my-personal-site:latest
+
     # steps:
     # - uses: actions/checkout@v3
     # - name: Build the Docker image
