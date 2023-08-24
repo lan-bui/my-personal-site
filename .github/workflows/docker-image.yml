@@ -4,6 +4,10 @@ on:
   push:
     branches: [ "master" ]
 
+env:
+  TEST_TAG: lanbui/my-personal-site:test
+  LATEST_TAG: lanbui/my-personal-site:latest
+  
 jobs:
 
   build:
@@ -15,19 +19,47 @@ jobs:
         name: Checkout
         uses: actions/checkout@v3
       -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       -
-        name: Build
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and export to Docker
         uses: docker/build-push-action@v4
         with:
           context: .
           load: true
-          tags: my-personal-site:latest
+          tags: ${{ env.TEST_TAG }}
       -
-        name: Inspect
+        name: Test
         run: |
-          docker image inspect my-personal-site:latest    
+          docker run --rm ${{ env.TEST_TAG }}          
+      -
+        name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ env.LATEST_TAG }}
+      # -
+      #   name: Build
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     context: .
+      #     load: true
+      #     tags: my-personal-site:latest
+      # -
+      #   name: Inspect
+      #   run: |
+      #     docker image inspect my-personal-site:latest    
           
     # steps:
     # - uses: actions/checkout@v3
