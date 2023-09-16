@@ -1,0 +1,156 @@
+{% extends "template.html" %} {% block main %}
+<div class="d-flex flex-column container-fluid hide">
+  <!-- Page Heading -->
+  <div class="d-flex align-items-center justify-content-between">
+    <h3 class="my-3">Text Assistant</h3>
+  </div>
+  <div>
+    <div class="form-group row">
+      <label for="languageSelection" class="col-sm-2 col-form-label"
+        >Output language</label
+      >
+      <div class="col-sm-3">
+        <select id="languageSelection" class="form-control custom-select">
+          <option value="Japanese" selected>Japanese</option>
+          <option value="English">English</option>
+          <option value="Vietnamese">Vietnamese</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="emotionSelection" class="col-sm-2 col-form-label"
+        >Option</label
+      >
+      <div class="col-sm-10">
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="emotionRadioOptions"
+            id="emotionRadio1"
+            value="translate"
+            checked
+          />
+          <label class="form-check-label" for="emotionRadio1">Translate</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="emotionRadioOptions"
+            id="emotionRadio2"
+            value="explain"
+          />
+          <label class="form-check-label" for="emotionRadio2">Explain</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="emotionRadioOptions"
+            id="emotionRadio3"
+            value="main-ideas"
+          />
+          <label class="form-check-label" for="emotionRadio3"
+            >List the main ideas</label
+          >
+        </div>
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="emotionRadioOptions"
+            id="emotionRadio4"
+            value="summarize"
+          />
+          <label class="form-check-label" for="emotionRadio4">Summarize</label>
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="styleSelection" class="col-sm-2 col-form-label">Style</label>
+      <div class="col-sm-10">
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="styleRadioOptions"
+            id="styleRadio1"
+            value="standard"
+            checked
+          />
+          <label class="form-check-label" for="styleRadio1">🙂Standard</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="styleRadioOptions"
+            id="styleRadio4"
+            value="solid"
+          />
+          <label class="form-check-label" for="styleRadio4">😐Solid</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="styleRadioOptions"
+            id="styleRadio2"
+            value="friendly"
+          />
+          <label class="form-check-label" for="styleRadio2">🤗Friendly</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="styleRadioOptions"
+            id="styleRadio3"
+            value="humorous"
+          />
+          <label class="form-check-label" for="styleRadio3">😂Humorous</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="styleRadioOptions"
+            id="styleRadio5"
+            value="lovely"
+          />
+          <label class="form-check-label" for="styleRadio5">🥰Lovely</label>
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="inputTextarea" class="col-sm-2 col-form-label"
+        >Input text<br /><sup>※In whatever language you prefer</sup></label
+      >
+      <div class="col-sm-10">
+        <textarea class="form-control" id="inputTextarea" rows="8"></textarea>
+      </div>
+    </div>
+    <div class="form-group row">
+      <div class="col-sm-10">
+        <button id="correct-button" class="btn btn-primary btn-lg">
+          　　Submit　　
+        </button>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="outputTextarea" class="col-sm-2 col-form-label">Result</label>
+      <div class="col-sm-10">
+        <textarea
+          class="form-control"
+          id="outputTextarea"
+          rows="8"
+          readonly
+        ></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/text-assistant.js"></script>
+{% endblock %}

@@ -1,0 +1,4 @@
+$(() => {
+  // initialize UI
+  $("#warning").hide();
+});
