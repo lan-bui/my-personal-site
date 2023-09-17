@@ -4,15 +4,14 @@ name: Trigger auto deployment for container-app-demo
 on:
   # Automatically trigger it when detected changes in repo
   push:
-    branches: 
-      [ master ]
+    branches: [master]
     paths:
-    - '**'
-    - '.github/workflows/container-app-demo-AutoDeployTrigger-db2db184-862d-4433-9061-d4a43da3acb5.yml'
+      - "**"
+      - ".github/workflows/container-app-demo-AutoDeployTrigger-db2db184-862d-4433-9061-d4a43da3acb5.yml"
 
-  # Allow mannually trigger 
+  # Allow mannually trigger
   workflow_dispatch:
-      
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -20,6 +19,35 @@ jobs:
     steps:
       - name: Checkout to the branch
         uses: actions/checkout@v2
+
+      - name: Create and populate .env file
+        env:
+          AZURE_OPENAI_SERVICE: ${{ secrets.AZURE_OPENAI_SERVICE }}
+          AZURE_OPENAI_KEY: ${{ secrets.AZURE_OPENAI_KEY }}
+          AZURE_OPENAI_CHAT_MODEL: ${{ secrets.AZURE_OPENAI_CHAT_MODEL }}
+          AZURE_OPENAI_CHAT_DEPLOYMENT: ${{ secrets.AZURE_OPENAI_CHAT_DEPLOYMENT }}
+        run: |
+          touch .env
+          echo UPLOAD_FOLDER="./data-upload" >> .env
+          echo ALLOWED_EXTENSIONS={'png', 'jpg', 'jpeg', 'gif'} >> .env
+          echo AZURE_OPENAI_SERVICE="$AZURE_OPENAI_SERVICE" >> .env
+          echo AZURE_OPENAI_KEY="$AZURE_OPENAI_KEY" >> .env
+          echo AZURE_OPENAI_API_VERSION="2023-07-01-preview" >> .env
+          echo AZURE_OPENAI_CHAT_MODEL="$AZURE_OPENAI_CHAT_MODEL" >> .env
+          echo AZURE_OPENAI_CHAT_DEPLOYMENT="$AZURE_OPENAI_CHAT_DEPLOYMENT" >> .env
+
+          echo "cat .env"
+          cat .env
+
+          echo "ls -a ."
+          ls -a .
+
+          echo "Move .env file to backend folder"
+          mv .env app/backend/
+
+          echo "ls -a ${{ github.workspace }}"
+          ls -a ${{ github.workspace }}
+        shell: bash
 
       - name: Azure Login
         uses: azure/login@v1
@@ -29,7 +57,7 @@ jobs:
       - name: Build and push container image to registry
         uses: azure/container-apps-deploy-action@v1
         with:
-          appSourcePath: ${{ github.workspace }} 
+          appSourcePath: ${{ github.workspace }}
           registryUrl: docker.io
           registryUsername: ${{ secrets.CONTAINERAPPDEMO_REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.CONTAINERAPPDEMO_REGISTRY_PASSWORD }}
@@ -37,6 +65,3 @@ jobs:
           resourceGroup: container-app-rg
           imageToBuild: lanbui/container-app-demo:${{ github.sha }}
           dockerfilePath: Dockerfile
-
-     
-
