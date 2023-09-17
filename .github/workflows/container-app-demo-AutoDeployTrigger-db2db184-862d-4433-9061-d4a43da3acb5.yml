@@ -42,11 +42,6 @@ jobs:
           echo "ls -a ."
           ls -a .
 
-          echo "Move .env file to backend folder"
-          mv .env app/backend/
-
-          echo "ls -a ${{ github.workspace }}"
-          ls -a ${{ github.workspace }}
         shell: bash
 
       - name: Azure Login
