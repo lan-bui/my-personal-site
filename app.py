@@ -148,33 +148,35 @@ def text_assistant():
             language = data['language']
             option = data['option']
             style = data['style']
-            system_content = 'You will be provided with statements, and your task is to '
-            # convert them to standard ' + data['language'] + '.'
-            
+            system_content = ''
+
             if option == 'translate':
-                system_content += 'translate them'
-            elif option == 'explain':
-                system_content += 'explain them for a second-grade student'
+                system_content = 'You will be provided with statements, and your task is to translate them into ' + language
+            elif option == 'correct':
+                system_content = 'You will be provided with statements, and your task is to convert them into standard ' + language
             elif option == 'main-ideas':
-                system_content += 'list the main ideas of them'
+                system_content = 'List the main ideas of content you are provided into ' + language
             elif option == 'summarize':
-                system_content += 'summarize them in one sentence'
+                system_content = 'Summarize content you are provided with for a second-grade student as short as posible in ' + language
+            elif option == 'reply':
+                system_content = 'You will be provided with a message, and your task is to respond this message in ' + language
+            elif option == 'memo':
+                system_content = 'Generate a email based on provided points in' + language
             else:
-                system_content += 'convert them'
+                system_content = 'You will be provided with statements, and your task is to convert them into standard ' + language
 
             if style == 'standard':
-                system_content += ' to standard ' + language + '.'
+                system_content += ' in a standard manner.'
             elif style == 'friendly':
-                system_content += ' to ' + language + ' in a friendly style.'
+                system_content += ' in  in a casual, friendly manner.'
             elif style == 'humorous':
-                system_content += ' to ' + language + ' in a humorous style.'
+                system_content += ' in a humorous style.'
             elif style == 'solid':
-                system_content += ' to ' + language + ' in a solid style.'
+                system_content += ' in a formarl style.'
             elif style == 'lovely':
-                system_content += ' to ' + language + ' in a lovely style.'
+                system_content += ' in a lovely style.'
             else:
-                system_content += ' to standard ' + language + '.'
-
+                system_content += ' in a standard manner.'
 
 
             response = openai.ChatCompletion.create(engine = AZURE_OPENAI_CHAT_DEPLOYMENT, 
