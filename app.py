@@ -1,7 +1,7 @@
 import os
 import json
 import logging
-import re
+from datetime import datetime
 
 from flask import Flask, Response, current_app, render_template, request, redirect, flash, send_from_directory
 from flask_cors import CORS
@@ -60,65 +60,73 @@ def home():
 @app.route("/compare-image", methods=['GET', 'POST'])
 def compare_image():
     if request.method == "GET":
-        return render_template("tools.html")
+        return render_template("compare-image.html")
     else:
-        # check if the post request has the file part
-        if 'image1' not in request.files:
-            flash('Not found file image1')
-            return redirect(request.url)
-        if 'image2' not in request.files:
-            flash('No found file image2')
-            return redirect(request.url)
+        try:
+            # check if the post request has the file part
+            if 'image1' not in request.files:
+                flash('Not found file image1')
+                return redirect(request.url)
+            if 'image2' not in request.files:
+                flash('No found file image2')
+                return redirect(request.url)
+            
+            image1 = request.files['image1']
+            image2 = request.files['image2']
+
+            # If the user does not select a file, the browser submits an
+            # empty file without a filename.
+            if image1.filename == '':
+                flash('No selected image1')
+                return redirect(request.url)
+            if image2.filename == '':
+                flash('No selected image2')
+                return redirect(request.url)
+            
+            now = datetime.now() # current date and time  
+            prefix = now.strftime("%Y%m%d_%H%M%S.%f")
+            
+            if image1 and allowed_file(image1.filename):
+                image1_filename = secure_filename(image1.filename)
+                image1_path = os.path.join(UPLOAD_FOLDER, prefix + '_' + image1_filename)
+                image1.save(image1_path)
+            if image2 and allowed_file(image2.filename):
+                image2_filename = secure_filename(image2.filename)
+                image2_path = os.path.join(UPLOAD_FOLDER, prefix + '_' + image2_filename)
+                image2.save(image2_path)
+
+            # Read the images using OpenCV
+            image1 = cv2.imread(image1_path)
+            image2 = cv2.imread(image2_path)
+
+            # Get the dimensions of the first image
+            height1, width1, _ = image1.shape
+
+            # Resize the second image to match the dimensions of the first image
+            image2_resized = cv2.resize(image2, (width1, height1))
+
+            image2 = image2_resized
+
+            # Compare the images using the Structural Similarity Index (SSIM)
+            gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
+            gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
+
+            error, diff1, diff2 = mse(gray1, gray2)
+
+            print("Image matching Error between the two images:", error)
+            diff1_file_name = prefix + '_diff_img_1.jpg'
+            diff1_file_path = os.path.join(UPLOAD_FOLDER, diff1_file_name)
+            cv2.imwrite(diff1_file_path, diff1)
+            
+            diff2_file_name = prefix + '_diff_img_2.jpg'
+            diff2_file_path = os.path.join(UPLOAD_FOLDER, diff2_file_name)
+            cv2.imwrite(diff2_file_path, diff2)
+
+            return json.dumps({'result1': diff1_file_name, 'result2': diff2_file_name})
         
-        image1 = request.files['image1']
-        image2 = request.files['image2']
-
-        # If the user does not select a file, the browser submits an
-        # empty file without a filename.
-        if image1.filename == '':
-            flash('No selected image1')
-            return redirect(request.url)
-        if image2.filename == '':
-            flash('No selected image2')
-            return redirect(request.url)
-        
-        if image1 and allowed_file(image1.filename):
-            image1_filename = secure_filename(image1.filename)
-            image1_path = os.path.join(UPLOAD_FOLDER, image1_filename)
-            image1.save(image1_path)
-        if image2 and allowed_file(image1.filename):
-            image2_filename = secure_filename(image2.filename)
-            image2_path = os.path.join(UPLOAD_FOLDER, image2_filename)
-            image2.save(image2_path)
-
-        # Read the images using OpenCV
-        image1 = cv2.imread(image1_path)
-        image2 = cv2.imread(image2_path)
-
-        # Get the dimensions of the first image
-        height1, width1, _ = image1.shape
-
-        # Resize the second image to match the dimensions of the first image
-        image2_resized = cv2.resize(image2, (width1, height1))
-
-        image2 = image2_resized
-
-        # Compare the images using the Structural Similarity Index (SSIM)
-        gray1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
-        gray2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
-
-        error, diff1, diff2 = mse(gray1, gray2)
-
-        print("Image matching Error between the two images:", error)
-        diff1_file_name = 'diff_img_1.jpg'
-        diff1_file_path = os.path.join(UPLOAD_FOLDER, diff1_file_name)
-        cv2.imwrite(diff1_file_path, diff1)
-        
-        diff2_file_name = 'diff_img_2.jpg'
-        diff2_file_path = os.path.join(UPLOAD_FOLDER, diff2_file_name)
-        cv2.imwrite(diff2_file_path, diff2)
-
-        return render_template('tools.html', result_image_1 = diff1_file_name, result_image_2 = diff2_file_name)
+        except Exception as e:
+            print(e.args)
+            return json.dumps({'error': e.args})
 
 # define the function to compute MSE between two images
 def mse(img1, img2):

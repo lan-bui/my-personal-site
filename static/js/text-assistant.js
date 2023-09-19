@@ -10,8 +10,6 @@ $(() => {
     // $("#loading_text").html("Processing ...");
     const response = await getResultFromGPT();
     const result = response["content"] ?? "";
-    $("#correct-button").disabled = false;
-    // $("#warning").hide();
     $("#correct-button").removeAttr("disabled");
     $("#outputTextarea").val(result);
   });
